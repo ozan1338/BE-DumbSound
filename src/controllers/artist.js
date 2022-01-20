@@ -17,6 +17,21 @@ const addArtist = async(req,res,next)=>{
     }
 }
 
+const getAllArtist = async(req,res,next)=>{
+    try {
+        const data = await artist.findAll()
+
+        res.send({
+            data
+        })
+
+    } catch (err) {
+        console.log(err);
+        next(err)
+    }
+}
+
 module.exports = {
-    addArtist
+    addArtist,
+    getAllArtist
 }

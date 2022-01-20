@@ -5,7 +5,7 @@ const addMusic = async(req,res,next)=>{
     try {
         const {...newData} = req.body
 
-        console.log(req.files);
+        //console.log(req.files);
 
         const imageSrc = "http://localhost:8080/uploads/" + req.files[0].filename
         const musicSrc = "http://localhost:8080/uploads/" + req.files[1].filename

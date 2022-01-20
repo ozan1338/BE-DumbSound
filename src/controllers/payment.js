@@ -8,21 +8,21 @@ const addPayment = async(req,res,next)=>{
 
         const startDate = () => {
             const date = new Date()
-            const day = date.getDate()
-            const month = date.getMonth()
-            const year = date.getFullYear()
+            let day = date.getDate()
+            let month = date.getMonth()
+            let year = date.getFullYear()
 
             return `${day}/${month+1}/${year}`
         }
 
         const dueDate = () => {
             const date = new Date()
-            const day = date.getDate()
-            const month = date.getMonth()
-            const year = date.getFullYear()
+            let day = date.getDate()
+            let month = date.getMonth()
+            let year = date.getFullYear()
 
-            if(!month === 11){
-                month += 2
+            if(!month === 11 || month === 0){
+                month = month + 2
             }else{
                 month = 1
             }

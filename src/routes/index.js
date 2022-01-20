@@ -14,7 +14,7 @@ const {registerUser,loginUser} = require('../controllers/user')
 const {addPayment, getAllPayment, updateStatus} = require("../controllers/payment")
 
 //artist controller
-const {addArtist} = require("../controllers/artist")
+const {addArtist,getAllArtist} = require("../controllers/artist")
 
 //music controller
 const {addMusic,getAllMusic} = require("../controllers/music")
@@ -30,6 +30,7 @@ router.patch("/transaction/:id", updateStatus)
 
 //Route artist
 router.post("/artist", verifyToken, addArtist)
+router.get("/artist", getAllArtist)
 
 //Route music
 router.post("/music", verifyToken, uploadFile("thumbnail","attache") , addMusic)
