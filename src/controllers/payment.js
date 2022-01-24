@@ -12,7 +12,7 @@ const addPayment = async(req,res,next)=>{
             let month = date.getMonth()
             let year = date.getFullYear()
 
-            return `${day}/${month+1}/${year}`
+            return `${month+1}/${day}/${year}`
         }
 
         const dueDate = () => {
@@ -27,14 +27,14 @@ const addPayment = async(req,res,next)=>{
                 month = 1
             }
 
-            return `${day}/${month}/${year}`
+            return `${month}/${day}/${year}`
         }
 
-        const imageSrc = "http://localhost:8080/uploads/" + req.files[0].filename
+        //const imageSrc = "http://localhost:8080/uploads/" + req.files[0].filename
 
         const newPayment = await payment.create({
             ...data,
-            attache: imageSrc,
+            attache: req.files[0].filename,
             userId: id,
             status: "pending",
             startDate: startDate(),
@@ -82,6 +82,8 @@ const getAllPayment = async(req,res,next)=>{
             }
         })
 
+        //data.attache = 
+
         res.send({
             data
         })
@@ -94,7 +96,9 @@ const getAllPayment = async(req,res,next)=>{
 const updateStatus = async(req,res,next) => {
     try {
         const {id} = req.params
-        const {...data} = req.body
+        const data = req.body
+
+        console.log(data.status);
 
         await payment.update({...data},{
             where: {
@@ -116,16 +120,30 @@ const updateStatus = async(req,res,next) => {
             }
         })
 
-        await user.update(
-            {
-                subscribe: "True"
-            },
-            {
-                where: {
-                    id: userWhoPaidForSubscribe.userId
+        if(data.status === "Approve"){
+            
+            await user.update(
+                {
+                    subscribe: "True"
+                },
+                {
+                    where: {
+                        id: userWhoPaidForSubscribe.userId
+                    }
                 }
-            }
-        )
+            )
+        }else if(data.status === "cancel"){
+            await user.update(
+                {
+                    subscribe: "False"
+                },
+                {
+                    where: {
+                        id: userWhoPaidForSubscribe.userId
+                    }
+                }
+            )
+        }
 
         res.send({
             msg: "success"
