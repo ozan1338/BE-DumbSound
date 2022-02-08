@@ -13,8 +13,14 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      user.hasMany(models.payment, {
+      user.hasOne(models.payment, {
         as: "payment",
+        foreignKey: {
+          name: "userId"
+        }
+      })
+      user.hasOne(models.notif,{
+        as: "notif",
         foreignKey: {
           name: "userId"
         }

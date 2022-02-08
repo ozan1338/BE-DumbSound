@@ -1,13 +1,13 @@
 const {registerSchema,loginSchema} = require("../middleware/joi")
 const createError = require('http-errors')
 const {createToken} = require("../middleware/jwt")
-const {user} = require("../../models")
+const {user, payment} = require("../../models")
 const bcrypt = require("bcrypt")
 
 //Create Controller for register
 const registerUser = async(req,res,next)=>{
     try {
-        console.log(req.body);
+        //console.log(req.body);
         //chech if user input valid
         const isValid = await registerSchema.validateAsync(req.body)
         
@@ -29,13 +29,17 @@ const registerUser = async(req,res,next)=>{
                 throw createError.InternalServerError();
             }
         })
+        console.log("YARO JANEKA")
+        console.log(data)
 
         //create Token for user
         const token = await createToken(data.id);
 
         res.send({
             msg: "success",
-            token
+            token,
+            status: data.status,
+            id: data.id,
         })
 
     } catch (error) {
@@ -59,8 +63,14 @@ const loginUser = async(req,res,next)=>{
         const data = await user.findAll({
             where: {
                 email: isValid.email
+            },
+            include: {
+                model: payment,
+                as: "payment"
             }
         })
+
+        console.log(data[0].payment);
 
         //if email that user input there is no in our db throw error with message
         if(!data[0]){
@@ -83,6 +93,7 @@ const loginUser = async(req,res,next)=>{
             email: data[0].email,
             fullname: data[0].fullname,
             status: data[0].status,
+            payment: data[0].payment,
             token
         })
 

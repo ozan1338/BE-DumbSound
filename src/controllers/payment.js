@@ -32,34 +32,63 @@ const addPayment = async(req,res,next)=>{
 
         //const imageSrc = "http://localhost:8080/uploads/" + req.files[0].filename
 
-        const newPayment = await payment.create({
-            ...data,
-            attache: req.files[0].filename,
-            userId: id,
-            status: "pending",
-            startDate: startDate(),
-            dueDate: dueDate()
-        })
-
-        const foundPayment = await payment.findOne({
-            where: {
-                id: newPayment.id
+        const doesExist = await user.findOne({
+            where:{
+                id
             },
-            include : {
-                model: user,
-                as: "user",
-                attributes: {
-                    exclude: ["password","createdAt","updatedAt"]
-                }
-            },
-            attributes: {
-                exclude:["createdAt","updatedAt","userId"]
+            include: {
+                model: payment,
+                as: "payment"
             }
         })
 
-        res.send({
-            data: foundPayment
-        })
+        console.log(doesExist.payment);
+
+        if(!doesExist.payment){
+            const newPayment = await payment.create({
+                ...data,
+                attache: req.files[0].filename,
+                userId: id,
+                status: "pending",
+                startDate: startDate(),
+                dueDate: dueDate()
+            })
+    
+            const foundPayment = await payment.findOne({
+                where: {
+                    id: newPayment.id
+                },
+                include : {
+                    model: user,
+                    as: "user",
+                    attributes: {
+                        exclude: ["password","createdAt","updatedAt"]
+                    }
+                },
+                attributes: {
+                    exclude:["createdAt","updatedAt","userId"]
+                }
+            })
+    
+            res.send({
+                data: foundPayment
+            })
+        }else if(doesExist.payment.status === "Approve"){
+            res.status(202).send({
+                status: "approved",
+                msg: "Payment Has Been Approved"
+            })
+        }else if(doesExist.payment.status === "pending"){
+            res.status(202).send({
+                status: "pending",
+                msg: "Payment Still Pending"
+            })
+        }else {
+            res.status(202).send({
+                status: "cancel",
+                msg: "Payment Has Been Canceled"
+            })
+        }
 
     } catch (err) {
         console.log(err);
@@ -87,6 +116,40 @@ const getAllPayment = async(req,res,next)=>{
         res.send({
             data
         })
+    } catch (err) {
+        console.log(err);
+        next(err)
+    }
+}
+
+const getPaymentStatusByUserId = async(req,res,next)=>{
+    try {
+        const {id} = req.params
+
+        const doesExist = await user.findOne({
+            where:{
+                id
+            },
+            include: {
+                model: payment,
+                as: "payment"
+            }
+        })
+
+        if(doesExist){
+            if(doesExist.payment.status === "pending"){
+                res.status(200)
+            }else{
+                res.send({
+                    status: doesExist.payment.status,
+                    msg: `Payment Has Been ${doesExist.payment.status}`
+                })
+            }
+        }else{
+            throw createError.NotFound()
+        }
+
+        
     } catch (err) {
         console.log(err);
         next(err)

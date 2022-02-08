@@ -11,13 +11,16 @@ const uploadFile = require("../middleware/multer")
 const {registerUser,loginUser} = require('../controllers/user')
 
 //payment contorller
-const {addPayment, getAllPayment, updateStatus} = require("../controllers/payment")
+const {addPayment, getAllPayment, updateStatus, getPaymentStatusByUserId} = require("../controllers/payment")
 
 //artist controller
 const {addArtist,getAllArtist} = require("../controllers/artist")
 
 //music controller
 const {addMusic,getAllMusic} = require("../controllers/music")
+
+//notif controlle
+const {addNotif,updateNotif,getNotifByUserId} = require("../controllers/notif")
 
 //Router user
 router.post("/user/register", registerUser)
@@ -31,6 +34,11 @@ router.patch("/transaction/:id", updateStatus)
 //Route artist
 router.post("/artist", verifyToken, addArtist)
 router.get("/artist", getAllArtist)
+
+//Route Notif
+router.post("/notif/:userId", addNotif)
+router.patch("/notif/:userId", updateNotif)
+router.get("/notif/:userId", getNotifByUserId)
 
 //Route music
 router.post("/music", verifyToken, uploadFile("thumbnail","attache") , addMusic)
